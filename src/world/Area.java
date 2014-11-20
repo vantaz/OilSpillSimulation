@@ -79,6 +79,7 @@ public class Area {
                              areaGrid[x][y].setType(E_CellType.LAND);
         }
         generateCoast();
+        updateArea2();
     }
 
     /**

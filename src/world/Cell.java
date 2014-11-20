@@ -139,6 +139,19 @@ public class Cell {
         return count;
     }
 
+    public void checkOil (Area area) {
+        type = this.getType();
+        int count = 0;
+        if (type == E_CellType.OIL) count++;
+        if (type == E_CellType.WATER || type == E_CellType.OIL || type == E_CellType.COAST) {
+            count += this.howManyNeighborsIn4(area, E_CellType.OIL);
+        }
+        if (count > 0) {
+            area.areaGrid2[this.getX()][this.getY()].oilLevel += count;
+            if (type == E_CellType.WATER || type == E_CellType.OIL) area.areaGrid2[this.getX()][this.getY()].setType(E_CellType.OIL);
+        }
+    }
+
     /**
      * Wyswietla w konsoli litere odpowiadajaca typowi komorki
      */
@@ -166,19 +179,5 @@ public class Cell {
 
     }
 
-    public void checkOil (Area area) {
-        type = this.getType();
-        int count = 0;
-        if (type == E_CellType.OIL) count++;
-        if (type == E_CellType.WATER || type == E_CellType.OIL || type == E_CellType.COAST) {
-            count += this.howManyNeighborsIn8(area, E_CellType.OIL);
-        }
-        if (count > 0) {
-            area.areaGrid2[this.getX()][this.getY()].oilLevel += count;
-            if (type == E_CellType.WATER || type == E_CellType.OIL) area.areaGrid2[this.getX()][this.getY()].setType(E_CellType.OIL);
-        }
-
-
-    }
 
 }
