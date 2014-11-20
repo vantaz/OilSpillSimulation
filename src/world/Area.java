@@ -9,6 +9,7 @@ public class Area {
 
     int dimension = 100;
     Cell[][] areaGrid;
+    Cell[][] areaGrid2;
 
     /**
      * Tworzy akwen o domyslnym wymiarze
@@ -18,6 +19,7 @@ public class Area {
         for (int x = 0; x<dimension; x++)
             for (int y = 0; y<dimension; y++)
                 areaGrid[x][y] = new Cell(x,y,E_CellType.WATER);
+        updateArea2();
     }
 
     /**
@@ -31,6 +33,22 @@ public class Area {
         for (int x = 0; x<dimension; x++)
             for (int y = 0; y<dimension; y++)
                 areaGrid[x][y] = new Cell(x,y,type);
+        updateArea2();
+    }
+
+    private void updateArea2 () {
+        areaGrid2 = new Cell[dimension][dimension];
+        for (int x = 0; x<dimension; x++)
+            for (int y = 0; y<dimension; y++)
+                areaGrid2[x][y] = new Cell(areaGrid[x][y]);
+    }
+
+    private void updateArea () {
+        areaGrid = new Cell[dimension][dimension];
+        for (int x = 0; x<dimension; x++)
+            for (int y = 0; y<dimension; y++)
+                areaGrid[x][y] = new Cell(areaGrid2[x][y]);
+
     }
 
     public int getDimension() {
@@ -53,11 +71,11 @@ public class Area {
             for (int x = 0; x < dimension; x++)
                 for (int y = 0; y < dimension; y++)
                     if (areaGrid[x][y].getType() == E_CellType.LAND) {
-                        if (areaGrid[x][y].howManyNeigborIn8(this, E_CellType.WATER) >= 4)
+                        if (areaGrid[x][y].howManyNeighborsIn8(this, E_CellType.WATER) >= 4)
                             areaGrid[x][y].setType(E_CellType.WATER);
                     }
                     else if (areaGrid[x][y].getType() == E_CellType.WATER)
-                        if (areaGrid[x][y].howManyNeigborIn8(this, E_CellType.LAND) >= 4)
+                        if (areaGrid[x][y].howManyNeighborsIn8(this, E_CellType.LAND) >= 4)
                              areaGrid[x][y].setType(E_CellType.LAND);
         }
         generateCoast();
@@ -78,10 +96,19 @@ public class Area {
             int x = generator.nextInt(dimension);
             int y = generator.nextInt(dimension);
             if (areaGrid[x][y].getType() == E_CellType.WATER) {
-                areaGrid[x][y] = new OilSpillSourceCell(x,y,generator.nextFloat(),generator.nextFloat());
+                areaGrid[x][y].setType(E_CellType.OIL);
+                areaGrid[x][y].setOilLevel(20);
                 break;
             }
         }
+    }
+
+    public void checkOilForAll () {
+        for (int x = 0; x<dimension; x++)
+            for (int y = 0; y<dimension; y++)
+                areaGrid[x][y].checkOil(this);
+
+        updateArea();
     }
 
     /**

@@ -11,8 +11,12 @@ public class Start {
 
     public static void main(String[] args) {
         area = new Area();
-        area.generateRandomArea(50);
+        //area.generateRandomArea(50);
         area.generateRandomSpillSource();
+
+        for (int i = 0; i < 30; i++)
+            area.checkOilForAll();
+
         area.consoleDisplay();
     }
 

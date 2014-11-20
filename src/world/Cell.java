@@ -26,6 +26,15 @@ public class Cell {
         this.type = type;
     }
 
+    public Cell (Cell cell) {
+        this.x = cell.getX();
+        this.y = cell.getY();
+        this.type = cell.getType();
+        this.oilLevel = cell.getOilLevel();
+        this.currentPower = cell.getCurrentPower();
+        this.currentDir = cell.getCurrentDir();
+    }
+
     public E_CellType getType () {
         return this.type;
     }
@@ -77,7 +86,7 @@ public class Cell {
      * @param area Obszar, w ktorym znajduje sie komorka
      */
     public void checkCoast (Area area) {
-        if (this.type == E_CellType.LAND && this.haveNeighborIn4(area, E_CellType.WATER) > 0)
+        if (this.type == E_CellType.LAND && this.howManyNeighborsIn4(area, E_CellType.WATER) > 0)
             this.type = E_CellType.COAST;
     }
 
@@ -88,7 +97,7 @@ public class Cell {
      * @param type Typ poszukiwanych sasiadow
      * @return liczba sasiadow o podanym typie
      */
-    public int haveNeighborIn4 (Area area, E_CellType type) {
+    public int howManyNeighborsIn4(Area area, E_CellType type) {
         int count = 0;
         if (x > 0 && area.areaGrid[x-1][y].getType() == type)
             count++;
@@ -108,7 +117,7 @@ public class Cell {
      * @param type Typ poszukiwanych sasiadow
      * @return liczba sasiadow o podanym typie
      */
-    public int howManyNeigborIn8 (Area area, E_CellType type) {
+    public int howManyNeighborsIn8(Area area, E_CellType type) {
         int count = 0;
         if (x > 0 && area.areaGrid[x-1][y].getType() == type) // WEST
             count++;
@@ -154,6 +163,21 @@ public class Cell {
                 System.out.print('S');
                 break;
         }
+
+    }
+
+    public void checkOil (Area area) {
+        type = this.getType();
+        int count = 0;
+        if (type == E_CellType.OIL) count++;
+        if (type == E_CellType.WATER || type == E_CellType.OIL || type == E_CellType.COAST) {
+            count += this.howManyNeighborsIn8(area, E_CellType.OIL);
+        }
+        if (count > 0) {
+            area.areaGrid2[this.getX()][this.getY()].oilLevel += count;
+            if (type == E_CellType.WATER || type == E_CellType.OIL) area.areaGrid2[this.getX()][this.getY()].setType(E_CellType.OIL);
+        }
+
 
     }
 
