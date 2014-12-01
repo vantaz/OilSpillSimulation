@@ -14,7 +14,8 @@ public class Area {
     /**
      * Tworzy akwen o domyslnym wymiarze
      */
-    public Area () {
+    public Area (int dimension) {
+        this.dimension = dimension;
         areaGrid = new Cell[dimension][dimension];
         for (int x = 0; x<dimension; x++)
             for (int y = 0; y<dimension; y++)
@@ -55,17 +56,20 @@ public class Area {
         return this.dimension;
     }
 
+    public Cell[][] getAreaGrid() {
+        return this.areaGrid;
+    }
+
     /**
      * Generuje losowy obszar - nieużyteczne!!!
      *
-     * @param landPercent Prawdopodobienstwo powstania ladu
      */
-    public void generateRandomArea (float landPercent) {
+    public void generateRandomArea () {
         Random generator = new Random();
 
         for (int x = 0; x<dimension; x++)
             for (int y = 0; y<dimension; y++)
-                if (generator.nextInt(100)+1 < landPercent)
+                if (generator.nextInt(100)+1 < 50)
                     areaGrid[x][y] = new Cell(x,y,E_CellType.LAND);
         for (int i = 0; i<5; i++) {
             for (int x = 0; x < dimension; x++)
@@ -98,18 +102,22 @@ public class Area {
             int y = generator.nextInt(dimension);
             if (areaGrid[x][y].getType() == E_CellType.WATER) {
                 areaGrid[x][y].setType(E_CellType.OIL);
-                areaGrid[x][y].setOilLevel(20);
+                areaGrid[x][y].setOilLevel(200);
                 break;
             }
         }
     }
 
     public void checkOilForAll () {
-        for (int x = 0; x<dimension; x++)
-            for (int y = 0; y<dimension; y++)
-                areaGrid[x][y].checkOil(this);
+        for (int x = 1; x<dimension-1; x++)
+            for (int y = 1; y<dimension-1; y++)
+                areaGrid[x][y].checkOil2(this);
 
         updateArea();
+    }
+
+    public Cell getCellAt(int x, int y) {
+        return areaGrid[x][y];
     }
 
     /**

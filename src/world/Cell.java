@@ -9,8 +9,8 @@ public class Cell {
     private int x;
     private int y;
 
-    private float oilLevel = 0;
-    private float currentPower = 0;
+    private double oilLevel = 0;
+    private double currentPower = 0;
     private E_Direction currentDir = E_Direction.NONE;
 
     /********************************************************************************************************/
@@ -47,11 +47,11 @@ public class Cell {
         return this.y;
     }
 
-    public float getOilLevel () {
+    public double getOilLevel() {
         return this.oilLevel;
     }
 
-    public float getCurrentPower () {
+    public double getCurrentPower() {
         return this.currentPower;
     }
 
@@ -86,7 +86,7 @@ public class Cell {
      * @param area Obszar, w ktorym znajduje sie komorka
      */
     public void checkCoast (Area area) {
-        if (this.type == E_CellType.LAND && this.howManyNeighborsIn4(area, E_CellType.WATER) > 0)
+        if (this.type == E_CellType.LAND && this.howManyNeighborsIn8(area, E_CellType.WATER) > 0)
             this.type = E_CellType.COAST;
     }
 
@@ -150,6 +150,39 @@ public class Cell {
             area.areaGrid2[this.getX()][this.getY()].oilLevel += count;
             if (type == E_CellType.WATER || type == E_CellType.OIL) area.areaGrid2[this.getX()][this.getY()].setType(E_CellType.OIL);
         }
+    }
+
+    private boolean isBorder (Area area) {
+        if (this.x == 0 || this.x == area.dimension || this.y == 0 || this.y == area.dimension) return true;
+        else return false;
+    }
+
+    public void checkOil2 (Area area) {
+        if (this.isBorder(area)) return;
+        type = this.getType();
+        if (type == E_CellType.LAND || type == E_CellType.BLOCK || type == E_CellType.COAST) return;
+        if (this.howManyNeighborsIn8(area,E_CellType.OIL) == 0) return;
+        double oilLevel = this.getOilLevel();
+/*
+        double newOilLevel = oilLevel + Consts.OIL_B_ADJ *(
+                (oilLevel - area.getCellAt(x-1,y).getOilLevel()) + (oilLevel - area.getCellAt(x+1,y).getOilLevel()) +
+                        (oilLevel - area.getCellAt(x,y-1).getOilLevel()) + (oilLevel - area.getCellAt(x,y+1).getOilLevel()));
+
+        newOilLevel += Consts.OIL_B_DIA * (
+                (oilLevel - area.getCellAt(x-1,y-1).getOilLevel()) + (oilLevel - area.getCellAt(x+1,y-1).getOilLevel()) +
+                        (oilLevel - area.getCellAt(x-1,y+1).getOilLevel()) + (oilLevel - area.getCellAt(x+1,y+1).getOilLevel()));
+*/
+        double newOilLevel = oilLevel + Consts.OIL_B_ADJ *(
+                (area.getCellAt(x-1,y).getOilLevel() - oilLevel) + (area.getCellAt(x+1,y).getOilLevel() - oilLevel) +
+                        (area.getCellAt(x,y-1).getOilLevel() - oilLevel) + (area.getCellAt(x,y+1).getOilLevel() - oilLevel));
+
+        newOilLevel += Consts.OIL_B_DIA * (
+                (area.getCellAt(x-1,y-1).getOilLevel() - oilLevel) + (area.getCellAt(x+1,y-1).getOilLevel() - oilLevel) +
+                        (area.getCellAt(x-1,y+1).getOilLevel() - oilLevel) + (area.getCellAt(x+1,y+1).getOilLevel() - oilLevel));
+
+        area.areaGrid2[this.getX()][this.getY()].oilLevel = newOilLevel;
+
+        if (newOilLevel > 0) area.areaGrid2[this.getX()][this.getY()].setType(E_CellType.OIL);
     }
 
     /**
