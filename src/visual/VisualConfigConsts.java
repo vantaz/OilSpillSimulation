@@ -6,4 +6,6 @@ package visual;
 public final class VisualConfigConsts {
 
     public static final short CELL_SIZE = 1;
+
+    public static final int WORLD_DIMENSION = 500;
 }

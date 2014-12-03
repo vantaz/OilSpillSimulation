@@ -13,11 +13,12 @@ import java.awt.*;
  */
 public class VisualCellRenderer extends DefaultTableCellRenderer {
 
-    private Color landColor = Color.green.darker().darker();
+    private Color landColor = Color.green.darker();
     private Color waterColor = Color.blue.darker();
     private Color coastColor = Color.yellow;
     private Color oilColor = Color.black;
     private Color blockColor = Color.red;
+    private Color sourceColor = Color.red;
 
     private Area area;
 
@@ -48,7 +49,7 @@ public class VisualCellRenderer extends DefaultTableCellRenderer {
                 renderer.setBackground(blockColor);
                 break;
             case SOURCE:
-                renderer.setBackground(oilColor);
+                renderer.setBackground(sourceColor);
                 break;
         }
 

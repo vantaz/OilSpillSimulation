@@ -12,19 +12,20 @@ public class Start {
     public static Area area;
 
     public static void main(String[] args) {
-        area = new Area(500);
+        area = new Area(VisualConfigConsts.WORLD_DIMENSION);
         area.generateRandomArea();
         area.generateRandomSpillSource();
-
+        System.out.println(area.getSummaryOilLevel()+" "+area.getAverageOilLevel());
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 VisualFrame frame = new VisualFrame(area);
                 frame.setVisible(true);
-                for (int i = 0; i < 3000; i++) {
+                for (int i = 0; i < 2000; i++) {
                     area.checkOilForAll();
                 }
+                System.out.println(area.getSummaryOilLevel()+" "+area.getAverageOilLevel()+" "+area.getWindPowerAtDirection(E_Direction.S));
             }
         } );
 
