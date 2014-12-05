@@ -16,6 +16,7 @@ public class Cell implements Serializable {
 
     private double currentPower = 0;
     private E_Direction currentDir = E_Direction.N;
+    private double[] currentDirectionsPower = new double[8];
 
     /********************************************************************************************************/
 
@@ -28,6 +29,12 @@ public class Cell implements Serializable {
         this.setType(type);
     }
 
+    public Cell (int x, int y, E_CellType type, double curP, E_Direction curDir) {
+        this.setXY(x,y);
+        this.setType(type);
+        this.setCurrent(curP,curDir);
+    }
+
     public Cell (Cell cell) {
         this.x = cell.getX();
         this.y = cell.getY();
@@ -35,6 +42,7 @@ public class Cell implements Serializable {
         this.oilLevel = cell.getOilLevel();
         this.currentPower = cell.getCurrentPower();
         this.currentDir = cell.getCurrentDir();
+        this.setCurrentDirectionsPower();
     }
 
     public E_CellType getType () {
@@ -80,11 +88,41 @@ public class Cell implements Serializable {
 
     public void uptadeOilLevel () {
         this.oilLevel = this.newOilLevel > 0 ? this.newOilLevel : 0;
+        if (this.getType() == E_CellType.WATER || this.getType() == E_CellType.OIL) {
+            if (this.newOilLevel > Consts.OIL_VISIBLE_LEVEL)
+                this.setType(E_CellType.OIL);
+            else
+                this.setType(E_CellType.WATER);
+        }
     }
 
-    public void setCurrent (float power, E_Direction dir) {
+    public void setCurrent (double power, E_Direction dir) {
         this.currentPower = power;
         this.currentDir = dir;
+        this.setCurrentDirectionsPower();
+    }
+
+    private void setCurrentDirectionsPower () {
+        if (Consts.CURRENT_ON) {
+            int dir = this.currentDir.ordinal();
+            this.currentDirectionsPower[dir] = this.currentPower;
+            this.currentDirectionsPower[(dir + 4) % 8] = -this.currentPower;
+            this.currentDirectionsPower[(dir + 1) % 8] = this.currentPower / 2;
+            this.currentDirectionsPower[(dir + 7) % 8] = this.currentPower / 2;
+            this.currentDirectionsPower[(dir + 3) % 8] = -this.currentPower / 2;
+            this.currentDirectionsPower[(dir + 5) % 8] = -this.currentPower / 2;
+            this.currentDirectionsPower[(dir + 2) % 8] = 0;
+            this.currentDirectionsPower[(dir + 6) % 8] = 0;
+        }
+        else {
+            for (int i = 0; i < 8; i++) {
+                this.currentDirectionsPower[i] = 0;
+            }
+        }
+    }
+
+    public double getCurrentPowerAtDirection (E_Direction dir) {
+        return this.currentDirectionsPower[dir.ordinal()];
     }
 
     /**
@@ -161,24 +199,58 @@ public class Cell implements Serializable {
         if (this.howManyNeighborsIn8(area,E_CellType.OIL) == 0 && this.howManyNeighborsIn8(area,E_CellType.SOURCE) == 0) return;
         double oilLevel = this.getOilLevel();
 
-        double newOilLevel = 0;
+        double newOilLevel = this.oilLevel;
+
+        double tmp = 0;
+        Cell cell;
+        E_CellType cellType;
 
         // Rozchodzenie sie ropy na komorki styczne bokiem z badana komorka.
-        newOilLevel = oilLevel + Consts.OIL_B_ADJ *(
-            ((1+area.getWindPowerAtDirection(E_Direction.S)) * area.getCellAt(x-1,y).getOilLevel() - oilLevel) +
-            ((1+area.getWindPowerAtDirection(E_Direction.N)) * area.getCellAt(x+1,y).getOilLevel() - oilLevel) +
-            ((1+area.getWindPowerAtDirection(E_Direction.W)) * area.getCellAt(x,y-1).getOilLevel() - oilLevel) +
-            ((1+area.getWindPowerAtDirection(E_Direction.E)) * area.getCellAt(x,y+1).getOilLevel() - oilLevel)
-        );
+        cell = area.getCellAt(x-1,y);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.S)+this.getCurrentPowerAtDirection(E_Direction.S)) * cell.getOilLevel() - oilLevel;
+
+        cell = area.getCellAt(x+1,y);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.N)+this.getCurrentPowerAtDirection(E_Direction.N)) * cell.getOilLevel() - oilLevel;
+
+        cell = area.getCellAt(x,y-1);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.E)+this.getCurrentPowerAtDirection(E_Direction.E)) * cell.getOilLevel() - oilLevel;
+
+        cell = area.getCellAt(x,y+1);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.W)+this.getCurrentPowerAtDirection(E_Direction.W)) * cell.getOilLevel() - oilLevel;
+
+        newOilLevel += tmp * Consts.OIL_B_ADJ;
+        tmp = 0;
 
         // Rozchodzenie sie ropy na komorki styczne naroznikami z badana komorka.
-        newOilLevel += Consts.OIL_B_DIA * (
-            ((1+area.getWindPowerAtDirection(E_Direction.SW)) * area.getCellAt(x-1,y-1).getOilLevel() - oilLevel) +
-            ((1+area.getWindPowerAtDirection(E_Direction.NW)) * area.getCellAt(x+1,y-1).getOilLevel() - oilLevel) +
-            ((1+area.getWindPowerAtDirection(E_Direction.SE)) * area.getCellAt(x-1,y+1).getOilLevel() - oilLevel) +
-            ((1+area.getWindPowerAtDirection(E_Direction.NE)) * area.getCellAt(x+1,y+1).getOilLevel() - oilLevel)
-        );
+        cell = area.getCellAt(x-1,y-1);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.SW)+this.getCurrentPowerAtDirection(E_Direction.SW)) * cell.getOilLevel() - oilLevel;
 
+        cell = area.getCellAt(x+1,y-1);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.NW)+this.getCurrentPowerAtDirection(E_Direction.NW)) * cell.getOilLevel() - oilLevel;
+
+        cell = area.getCellAt(x-1,y+1);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.SE)+this.getCurrentPowerAtDirection(E_Direction.SE)) * cell.getOilLevel() - oilLevel;
+
+        cell = area.getCellAt(x+1,y+1);
+        cellType = cell.getType();
+        if (cellType == E_CellType.WATER || cellType == E_CellType.OIL || cellType == E_CellType.SOURCE)
+            tmp += (1+area.getWindPowerAtDirection(E_Direction.NE)+this.getCurrentPowerAtDirection(E_Direction.NE)) * cell.getOilLevel() - oilLevel;
+
+        newOilLevel += tmp * Consts.OIL_B_DIA;
 
         // Zmniejszenie poziomu ropy poprzez parowanie
         if (Consts.EVAPORATE_ON) {
@@ -187,7 +259,6 @@ public class Cell implements Serializable {
         }
 
         this.setNewOilLevel(newOilLevel);
-        if (newOilLevel > Consts.OIL_VISIBLE_LEVEL && this.getType() != E_CellType.SOURCE) this.setType(E_CellType.OIL);
     }
 
     /**
