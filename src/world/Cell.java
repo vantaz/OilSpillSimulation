@@ -102,8 +102,13 @@ public class Cell implements Serializable {
         this.setCurrentDirectionsPower();
     }
 
+    public void setCurrent (double power) {
+        this.currentPower = power;
+        this.setCurrentDirectionsPower();
+    }
+
     private void setCurrentDirectionsPower () {
-        if (Consts.CURRENT_ON) {
+        if (Consts.currentOn) {
             int dir = this.currentDir.ordinal();
             this.currentDirectionsPower[dir] = this.currentPower;
             this.currentDirectionsPower[(dir + 4) % 8] = -this.currentPower;
@@ -253,12 +258,19 @@ public class Cell implements Serializable {
         newOilLevel += tmp * Consts.OIL_B_DIA;
 
         // Zmniejszenie poziomu ropy poprzez parowanie
-        if (Consts.EVAPORATE_ON) {
+        if (Consts.evaporateOn) {
             newOilLevel -= Consts.EVAPORATION_RATE * 0.5 * (area.getTemperature()+273);
             if (newOilLevel < 0) newOilLevel = 0;
         }
 
         this.setNewOilLevel(newOilLevel);
+    }
+
+    public String getInfo () {
+        return ("Directories: " + new Integer(x).toString() + " " + new Integer(y).toString() + "\n" +
+                "Oil Level: " + new Double(oilLevel).toString() + "\n" +
+                "Current Power: " + new Double(currentPower).toString() + " direction: " + currentDir.toString()
+        );
     }
 
     /**

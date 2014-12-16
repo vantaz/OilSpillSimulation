@@ -67,12 +67,17 @@ public class Area implements Serializable {
         this.setWindDirectionsPower();
     }
 
+    public void setWind (E_Direction dir) {
+        this.windDirection = dir;
+        this.setWindDirectionsPower();
+    }
+
     public double getWindPower () {
         return this.windPower;
     }
 
-    private void setWindDirectionsPower () {
-        if (Consts.WIND_ON) {
+    public void setWindDirectionsPower () {
+        if (Consts.windOn) {
             int dir = this.windDirection.ordinal();
             this.windDirectionsPower[dir] = this.windPower;
             this.windDirectionsPower[(dir + 4) % 8] = -this.windPower;
@@ -105,7 +110,7 @@ public class Area implements Serializable {
             for (int y = 0; y<dimension; y++)
                 areaGrid[x][y] = new Cell(x,y,E_CellType.WATER);
 
-        generateSpillSource(400,250);
+        generateSpillSource(250,250);
         generateCurrent(250);
     }
 
@@ -137,7 +142,7 @@ public class Area implements Serializable {
         }
 
         generateCoast();
-        generateRandomSpillSource();
+        //generateRandomSpillSource();
         generateCurrent(250);
         generateRandomCurrent();
     }
@@ -309,6 +314,22 @@ public class Area implements Serializable {
     public void consoleDisplayWind () {
         for (int i = 0; i<8; i++)
             System.out.println(windDirectionsPower[i]);
+    }
+
+    public void turnWindOn (boolean on) {
+        if (!on) setWind(Consts.DEFAULT_WIND_POWER,windDirection);
+        else setWind(0,windDirection);
+    }
+
+    public void turnCurrentOn (boolean on) {
+        if (!on)
+            for (int x = 0; x<dimension; x++)
+                for (int y = 0; y<dimension; y++)
+                    areaGrid[x][y].setCurrent(0);
+        else
+            for (int x = 0; x<dimension; x++)
+                for (int y = 0; y<dimension; y++)
+                    areaGrid[x][y].setCurrent(Consts.DEFAULT_CURRENT_POWER);
     }
 
     public void displayAreaInfo () {

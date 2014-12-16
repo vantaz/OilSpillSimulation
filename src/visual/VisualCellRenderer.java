@@ -55,6 +55,8 @@ public class VisualCellRenderer extends DefaultTableCellRenderer {
 
         this.setBorder (BorderFactory.createEmptyBorder());
 
+        if (isSelected) renderer.setBackground(Color.CYAN);
+
         return this;
     }
 }

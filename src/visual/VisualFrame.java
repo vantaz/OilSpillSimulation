@@ -1,7 +1,8 @@
 package visual;
 
-import javafx.scene.control.Cell;
 import world.Area;
+import world.Consts;
+import world.E_Direction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,44 +12,80 @@ import java.awt.*;
  */
 public class VisualFrame extends JFrame {
 
-    private JTable areaTable;
+    private AreaTable areaTable;
+    private static Area area;
 
-    private JButton bRefresh;
+    private JSplitPane mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    private VisualButtonPanel buttonPanel;
+    private JScrollPane areaPanel;
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public VisualFrame(Area area) {
         setTitle("Spill some oil");
-        setSize(700, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        initGUI(area);
+        this.area = area;
+        areaTable = new AreaTable(area,this);
+
+        setOptimalSize();
+        setLocationRelativeTo(null);
+
+        buttonPanel = new VisualButtonPanel(area,this);
+        areaPanel = new JScrollPane(areaTable);
+
+        initGUI();
     }
 
-    private void initGUI(Area area) {
+    private void setOptimalSize() {
+        int dim = areaTable.getColumnCount() * VisualConfigConsts.CELL_SIZE + 10;
+        setSize(dim+300,dim+50);
+    }
 
-        Container pane = getContentPane();
+    private void initGUI() {
 
-        areaTable = new JTable(area.getDimension(),area.getDimension());
-        areaTable.setDefaultRenderer(Object.class, new VisualCellRenderer(area));
+        Container contentPane = getContentPane();
 
-        areaTable.setTableHeader(null);
-        areaTable.setShowGrid(false);
-        areaTable.setIntercellSpacing(new Dimension(0, 0));
-        areaTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        mainPanel.setDividerLocation(areaTable.getColumnCount() * VisualConfigConsts.CELL_SIZE + 10);
+        mainPanel.setLeftComponent(areaPanel);
+        mainPanel.setRightComponent(buttonPanel);
 
-        areaTable.setRowHeight(VisualConfigConsts.CELL_SIZE);
-        for (int i = 0; i<area.getDimension(); i++) {
-            areaTable.getColumnModel().getColumn(i).setMaxWidth(VisualConfigConsts.CELL_SIZE);
-            areaTable.getColumnModel().getColumn(i).setMinWidth(VisualConfigConsts.CELL_SIZE);
-            areaTable.getColumnModel().getColumn(i).setPreferredWidth(VisualConfigConsts.CELL_SIZE);
+        contentPane.add(mainPanel);
+
+    }
+
+    public void setInfo(int x, int y) {
+        buttonPanel.setInfo(y,x);
+    }
+
+    public void setSpillAtSelected () {
+        area.generateSpillSource(areaTable.getSelectedRow(),areaTable.getSelectedColumn());
+    }
+
+    public void nextIterations (int ile) {
+        for (int i = 0; i < ile; i++) {
+            area.checkOilForCircle();
         }
-        bRefresh = new JButton("Refresh");
-        pane.add(bRefresh);
-        pane.add(new JScrollPane(areaTable));
-
-
-
+        areaPanel.repaint();
     }
 
+    public void turnWindOn (boolean wind) {
+        area.turnWindOn(wind);
+    }
+
+    public void turnCurrentOn (boolean current) {
+        area.turnCurrentOn(current);
+    }
+
+    public void setWind (E_Direction dir) {
+        area.setWind(dir);
+    }
+
+    public void generateArea () {
+        area.generateRandomArea();
+        areaPanel.repaint();
+    }
 
 }

@@ -12,25 +12,22 @@ public class Start {
     public static Area area;
 
     public static void main(String[] args) {
+        System.out.println("MAIN START");
+
         area = new Area(VisualConfigConsts.WORLD_DIMENSION);
-        //area.generateTestArea();
-        area.generateRandomArea();
-        System.out.println(area.getSummaryOilLevel()+" "+area.getAverageOilLevel());
+        area.generateTestArea();
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < 500; i++) {
-                    area.checkOilForCircle();
-                }
+
                 VisualFrame frame = new VisualFrame(area);
                 frame.setVisible(true);
-                System.out.println(area.getSummaryOilLevel()+" "+area.getAverageOilLevel()+" "+area.getWindPowerAtDirection(E_Direction.S));
-                area.displayAreaInfo();
+
             }
         } );
 
-
+        System.out.println("MAIN END");
     }
 
 }
