@@ -72,6 +72,11 @@ public class Area implements Serializable {
         this.setWindDirectionsPower();
     }
 
+    public void setWind (double power) {
+        this.windPower = power;
+        this.setWindDirectionsPower();
+    }
+
     public double getWindPower () {
         return this.windPower;
     }

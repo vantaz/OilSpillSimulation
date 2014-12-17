@@ -17,6 +17,9 @@ public class VisualCellRenderer extends DefaultTableCellRenderer {
     private Color waterColor = Color.blue.darker();
     private Color coastColor = Color.yellow;
     private Color oilColor = Color.black;
+    private Color oilColor1 = new Color(22);
+    private Color oilColor2 = new Color(44);
+    private Color oilColor3 = new Color(77);
     private Color blockColor = Color.red;
     private Color sourceColor = Color.red;
 
@@ -44,6 +47,9 @@ public class VisualCellRenderer extends DefaultTableCellRenderer {
                 break;
             case OIL:
                 renderer.setBackground(oilColor);
+                if (area.getCellAt(row,col).getOilLevel() < 1.0E-15) renderer.setBackground(oilColor3);
+                else if (area.getCellAt(row,col).getOilLevel() < 1.0E-8) renderer.setBackground(oilColor2);
+                else if (area.getCellAt(row,col).getOilLevel() < 1.0E-4) renderer.setBackground(oilColor1);
                 break;
             case BLOCK:
                 renderer.setBackground(blockColor);

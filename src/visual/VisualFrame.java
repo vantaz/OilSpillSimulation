@@ -88,6 +88,10 @@ public class VisualFrame extends JFrame {
         area.setWind(dir);
     }
 
+    public void setWind (double power) {
+        area.setWind(power);
+    }
+
     public void generateArea () {
         area.generateRandomArea();
         areaPanel.repaint();

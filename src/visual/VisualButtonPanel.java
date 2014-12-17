@@ -1,9 +1,12 @@
 package visual;
 
 import world.Area;
+import world.Consts;
 import world.E_Direction;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +34,8 @@ public class VisualButtonPanel extends JPanel {
     private JLabel lCurrentOn = new JLabel("Current");
 
     private JComboBox<E_Direction> cWindDir = new JComboBox();
-    private JLabel lWindDir = new JLabel("Wind Direction:");
+    private JSlider sWindPow = new JSlider();
+    private JLabel lWindDir = new JLabel("Wind direction:");
 
     private JButton bLand = new JButton("Make Land");
 
@@ -126,6 +130,19 @@ public class VisualButtonPanel extends JPanel {
             }
         });
         buttonPanel.add(panel7);
+
+        JPanel panel75 = new JPanel ();
+        panel75.add(sWindPow);
+        sWindPow.setMinimum(0);
+        sWindPow.setMaximum(100);
+        sWindPow.setValue((int) (Consts.DEFAULT_WIND_POWER * 100));
+        sWindPow.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                fr.setWind((double)(sWindPow.getValue()/100));
+            }
+        });
+        buttonPanel.add(panel75);
 
         JPanel panel6 = new JPanel();
         panel6.add(cCurrentOn);
