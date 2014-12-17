@@ -64,6 +64,11 @@ public class VisualFrame extends JFrame {
         area.generateSpillSource(areaTable.getSelectedRow(),areaTable.getSelectedColumn());
     }
 
+    public void makeLandAtSelected () {
+        area.makeLandHere(areaTable.getSelectedRow(),areaTable.getSelectedColumn());
+        areaTable.repaint();
+    }
+
     public void nextIterations (int ile) {
         for (int i = 0; i < ile; i++) {
             area.checkOilForCircle();

@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 
 /**
  * Created by VanitaZ on 2014-12-14.
+ * Panel przycisków
  */
 public class VisualButtonPanel extends JPanel {
 
@@ -31,6 +32,8 @@ public class VisualButtonPanel extends JPanel {
 
     private JComboBox<E_Direction> cWindDir = new JComboBox();
     private JLabel lWindDir = new JLabel("Wind Direction:");
+
+    private JButton bLand = new JButton("Make Land");
 
     private JTextArea aInfo = new JTextArea();
 
@@ -135,6 +138,18 @@ public class VisualButtonPanel extends JPanel {
         });
         panel6.add(lCurrentOn);
         buttonPanel.add(panel6);
+
+        /*
+        JPanel panel8 = new JPanel();
+        panel8.add(bLand);
+        bLand.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fr.makeLandAtSelected();
+            }
+        });
+        buttonPanel.add(panel8);
+        */
     }
 
     private void buildInfoPanel () {

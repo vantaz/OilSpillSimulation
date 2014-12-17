@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 
 /**
  * Created by VanitaZ on 2014-12-14.
+ * Klasa zarządzająca wyświetlaną tablicą obszaru (wizualizacja)
  */
 
 public class AreaTable extends JTable {

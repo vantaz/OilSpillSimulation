@@ -121,6 +121,10 @@ public class Area implements Serializable {
     public void generateRandomArea () {
         Random generator = new Random();
 
+        for (int x = 0; x<dimension; x++)
+            for (int y = 0; y<dimension; y++)
+                areaGrid[x][y] = new Cell(x,y,E_CellType.WATER);
+
         for (int x = 0; x < dimension; x++)
             for (int y = 0; y < dimension; y++) {
                 if (generator.nextInt(100) > 50)
@@ -142,10 +146,11 @@ public class Area implements Serializable {
         }
 
         generateCoast();
-        //generateRandomSpillSource();
         generateCurrent(250);
         generateRandomCurrent();
     }
+
+
 
     /**
      * Ustawia typ odpowiednich komorek na wybrzeze
@@ -156,12 +161,19 @@ public class Area implements Serializable {
                 areaGrid[x][y].checkCoast(this);
     }
 
+    /**
+     * Generuje prąd o domyślnej sile wokół podanego punktu
+     * @param cX
+     */
     public void generateCurrent (int cX) {
         for (int x = cX - 30; x < cX + 30; x++)
             for (int y = 0; y < dimension; y++)
                 areaGrid[x][y].setCurrent(Consts.DEFAULT_CURRENT_POWER,Consts.DEFAULT_CURRENT_DIR);
     }
 
+    /**
+     * Generuje losowy prąd w losowym miejscu
+     */
     public void generateRandomCurrent () {
         Random generator = new Random();
         int x = generator.nextInt(dimension-15);
@@ -225,6 +237,9 @@ public class Area implements Serializable {
         this.uptadeOilLevelForAll();
     }
 
+    /**
+     * Przelicza poziom ropy dla obszaru, w którym może ona występować
+     */
     public void checkOilForCircle () {
         iterations++;
 
@@ -332,6 +347,15 @@ public class Area implements Serializable {
                     areaGrid[x][y].setCurrent(Consts.DEFAULT_CURRENT_POWER);
     }
 
+    public void makeLandHere (int i, int j) {
+        for (int x = i-5; x<i+5; x++)
+            for (int y = j-5; y<j+5; y++)
+                areaGrid[x][y] = new Cell(x,y,E_CellType.LAND);
+    }
+
+    /**
+     * Wyświetla różne informacje o obszarze w konsoli
+     */
     public void displayAreaInfo () {
         System.out.println("Wind power & direction: " + this.windPower + "" + this.windDirection.toString());
         System.out.print("Wind power at directions: ");

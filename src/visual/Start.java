@@ -6,6 +6,7 @@ import java.awt.*;
 
 /**
  * Created by VanitaZ on 2014-11-20.
+ * Klasa inicjująca program
  */
 public class Start {
 

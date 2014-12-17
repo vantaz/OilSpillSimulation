@@ -23,7 +23,7 @@ public final class Consts {
 
     // Domyslna predkosc wiatru
     public static final E_Direction DEFAULT_WIND_DIRECTION = E_Direction.N;
-    public static final double DEFAULT_WIND_POWER = 0.2;
+    public static final double DEFAULT_WIND_POWER = 0.4;
 
     // Domyslna predkosc pradu
     public static final E_Direction DEFAULT_CURRENT_DIR = E_Direction.W;
